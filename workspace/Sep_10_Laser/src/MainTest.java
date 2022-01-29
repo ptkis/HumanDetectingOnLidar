@@ -38,7 +38,7 @@ public class MainTest {
 	int angle=360;
 	int scale=120;
 	boolean start = false;
-	String file="E:/JAVA/workspace/Laser/1.txt";
+	String file="1.txt";
 	public static void main(String[] args) throws InterruptedException, IOException {
 		MainTest main = new MainTest();
 		main.init();
@@ -449,7 +449,7 @@ public class MainTest {
 		frame.repaint();
 	}
 	public void loadSettings() throws FileNotFoundException, IOException{
-		String tmpName="E:/JAVA/workspace/Laser/program.properties";
+		String tmpName="program.properties";
 		if(new File(tmpName).exists()){
 			Properties settings = new Properties();
 			settings.load(new FileInputStream(tmpName));
@@ -460,11 +460,11 @@ public class MainTest {
 			powerOfVariance=Integer.parseInt(settings.getProperty("powerOfVariance","100"));
 			angle=Integer.parseInt(settings.getProperty("angle","360"));
 			scale=Integer.parseInt(settings.getProperty("scale","120"));
-			file=settings.getProperty("file","E:/JAVA/workspace/Laser/1.txt");
+			file=settings.getProperty("file","1.txt");
 		}
 	}
 	public void saveSettings() throws IOException{
-		String tmpName="E:/JAVA/workspace/Laser/program.properties";
+		String tmpName="program.properties";
 		Properties settings = new Properties();
 		settings.put("divisor",  String.valueOf(divisor));
 		settings.put("shift",  String.valueOf(shift));
