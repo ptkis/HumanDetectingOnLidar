@@ -477,6 +477,13 @@ public class MainFromRadar extends Thread{
 		sliderOfAngle.setBounds(view.DEFAULT_SIZE, 630, view.WIDTH_BUTTON, 40);
 		view.add(sliderOfAngle);
 
+		new Timer(10, e -> {
+			try {
+				stepFromRadar();
+			} catch (InterruptedException ignore) {
+			}
+		}).start();
+
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setTitle("Cluster");
@@ -522,7 +529,7 @@ public class MainFromRadar extends Thread{
 			data.cluster();
 		}
 		view.updateMouse();
-		frame.repaint();
+//		frame.repaint();
 	}
 	
 	
