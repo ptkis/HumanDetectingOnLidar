@@ -86,7 +86,7 @@ public class View extends JPanel {
 			g2.fillOval((int) (x), (int) (y) + shift, 3, 3);
 
 		}
-		// ±‡∫≈£°£°
+		// Êô§Áòç„Ñê„Ñê
 		if (isNumbered) {
 			x = y = 0;
 			for (int i = 0; i < data.getDepths().size(); i++) {
