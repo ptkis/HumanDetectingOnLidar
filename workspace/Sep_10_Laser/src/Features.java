@@ -142,9 +142,6 @@ public class Features {
 	}
 
 	public double[][] getAllFeatures() {
-		// getDepthsDataInArray,获取指定flag下的深度数据，返回的是数组
-		// 返回的数组传入getXY，获得制定flag下的xy数据，返回二维数组，xy[][2]
-		// 然后传入获取特征值函数，结果直接写入域中
 		for(int i=0;i<LOS.length;i++){
 			LOS[i]=getLOS(getXY(getDepthsDataInArray(i+1)));
 			MCCOS[i]=getMCCOS(getXY(getDepthsDataInArray(i+1)));

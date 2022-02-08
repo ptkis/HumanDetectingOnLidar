@@ -12,7 +12,7 @@ import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 
 public class SocketForRadar {
 	public static void main(String[] args) {
-		String ServerIpAddress = "192.168.1.105";// 对方的IP
+		String ServerIpAddress = "192.168.1.105";
 		// String ServerIpAddress = "localhost";
 		int PORT = 6666;
 		DataOutputStream dos = null;
@@ -38,7 +38,7 @@ public class SocketForRadar {
 			System.out.println("Connect!");
 			while (true) {
 				inputstream = client.getInputStream();
-				len = inputstream.read(serverSay);// 接受服务器消息
+				len = inputstream.read(serverSay);//
 				// System.out.println("Server:"+new String(serverSay, 0, len));
 
 				if (serverSay[0] == 79 && serverSay[1] == 75) {
