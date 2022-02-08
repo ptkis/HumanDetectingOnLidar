@@ -11,17 +11,19 @@ public class RadarReader extends Thread{
 	public UrgDevice device;
 	public RadarReader(){
 		device = new UrgDevice(new EthernetConnection());
+	}
+	public void connect() {
 		device.connect("192.168.0.10");
 		RangeSensorInformation info = device.getInformation();
-        if(info != null){
-        System.out.println("Sensor model:" + info.product);
-        System.out.println("Sensor serial number:" + info.serial_number);
-        }else{
-            System.out.println("Sensor error:" + device.what());
-        }
-        device.setCaptureMode(CaptureSettings.CaptureMode.MD_Capture_mode);
-        //We set the capture type to a continuous mode so we have to start the capture
-        device.startCapture();
+		if(info != null){
+			System.out.println("Sensor model:" + info.product);
+			System.out.println("Sensor serial number:" + info.serial_number);
+		}else{
+			System.out.println("Sensor error:" + device.what());
+		}
+		device.setCaptureMode(CaptureSettings.CaptureMode.MD_Capture_mode);
+		//We set the capture type to a continuous mode so we have to start the capture
+		device.startCapture();
 	}
 	public void run(){
 		boolean flag=true;
@@ -55,6 +57,7 @@ public class RadarReader extends Thread{
 	public static void main(String args[]) throws InterruptedException{
 		Scanner in = new Scanner(System.in);
 		RadarReader a = new RadarReader();
+		a.connect();
 		a.setName("reader");
 		a.start();
 		boolean tu=true;

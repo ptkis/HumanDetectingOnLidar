@@ -9,12 +9,16 @@ import javax.swing.JPanel;
 public class View extends JPanel {
 	Data data;
 	public int maxRange = 10000;
-	public final int DEFAULT_SIZE = 700;
-	public final int WIDTH_BUTTON = 150;
+	public static final int DEFAULT_SIZE = 700;
+	public static final int WIDTH_BUTTON = 150;
 	public boolean isNumbered = false;
 	public int totalAngle;
 	public int scale;
 	public int shift;
+	public int minimumX = 0;
+	public int minimumY = 0;
+	public int maximumX = DEFAULT_SIZE;
+	public int maximumY = DEFAULT_SIZE;
 
 	public View() {
 		super();
@@ -37,6 +41,10 @@ public class View extends JPanel {
 		Graphics2D g2 = (Graphics2D) g;
 		double range = maxRange * scale / 100;
 		g2.setFont(new Font("Consolas", Font.PLAIN, 15));
+		g2.drawString("minimumX", DEFAULT_SIZE + 7, 368);
+		g2.drawString("minimumY", DEFAULT_SIZE + 7, 398);
+		g2.drawString("maximumX", DEFAULT_SIZE + 7, 428);
+		g2.drawString("maximumY", DEFAULT_SIZE + 7, 458);
 		g2.drawString("shift", DEFAULT_SIZE + 7, 488);
 		g2.drawString("divisor", DEFAULT_SIZE + 7, 518);
 		g2.drawString("powerOfMaxGroup", DEFAULT_SIZE + 7, 548);
@@ -44,7 +52,7 @@ public class View extends JPanel {
 		g2.drawString("scale", DEFAULT_SIZE + 7, 608);
 		g2.drawString("angle", DEFAULT_SIZE + 7, 638);
 		g2.setFont(new Font("Consolas", Font.BOLD, 20));
-		g2.drawString("YullionStudio", DEFAULT_SIZE + 2, 680);
+		g2.drawString("Museum Kota Lama", DEFAULT_SIZE + 2, 680);
 		g2.drawLine(0, DEFAULT_SIZE / 2 + shift, DEFAULT_SIZE, DEFAULT_SIZE / 2 + shift);
 		g2.drawLine(DEFAULT_SIZE / 2, 0, DEFAULT_SIZE / 2, DEFAULT_SIZE);
 		g2.drawLine(0, 0 + shift, DEFAULT_SIZE, DEFAULT_SIZE + shift);
@@ -69,6 +77,9 @@ public class View extends JPanel {
 				// System.out.println(((double)(i+1)*50)+"/"+(DEFAULT_SIZE/2));
 			}
 		}
+		g2.setColor(Color.RED);
+		g2.drawRect(minimumX, minimumY + shift, maximumX - minimumX, maximumY - minimumY);
+
 		g2.setColor(Color.BLUE);
 		for (int i = 0; i < data.getDepths().size(); i++) {
 			x = y = 0;
@@ -83,7 +94,11 @@ public class View extends JPanel {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 			}
-			g2.fillOval((int) (x), (int) (y) + shift, 3, 3);
+			// check bounds
+
+			if (x >= minimumX && x <= maximumX && y >= minimumY && y <= maximumY) {
+				g2.fillOval((int) (x), (int) (y) + shift, 3, 3);
+			}
 
 		}
 		// 晤瘍ㄐㄐ

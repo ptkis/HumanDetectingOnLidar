@@ -24,6 +24,7 @@ import com.kristou.urgLibJ.RangeSensor.Capture.CaptureData;
 import com.kristou.urgLibJ.RangeSensor.Capture.CaptureSettings;
 
 public class MainFromRadar extends Thread{
+	private static final boolean ENABLE_RADAR = true;
 	JFrame frame;
 	View view;
 	Data data;
@@ -36,6 +37,10 @@ public class MainFromRadar extends Thread{
 	JSlider sliderOfScale;
 	JSlider sliderOfAngle;
 	JSlider sliderOfShift;
+	JSlider sliderOfMinimumX;
+	JSlider sliderOfMinimumY;
+	JSlider sliderOfMaximumX;
+	JSlider sliderOfMaximumY;
 
 
 	// minThreshold=maxDepth/divisor
@@ -46,6 +51,10 @@ public class MainFromRadar extends Thread{
 	int powerOfVariance = 100;
 	int angle=360;
 	int scale=120;
+	int minimumX = 0;
+	int minimumY = 0;
+	int maximumX = View.DEFAULT_SIZE;
+	int maximumY = View.DEFAULT_SIZE;
 	boolean start = false;
 	String file="1.txt";
 
@@ -68,8 +77,13 @@ public class MainFromRadar extends Thread{
 	public void init() throws IOException {
 
 		radarReader = new RadarReader();
+		if (ENABLE_RADAR) {
+			radarReader.connect();
+		}
 		radarReader.setName("reader");
-		radarReader.start();
+		if (ENABLE_RADAR) {
+			radarReader.start();
+		}
 		loadSettings();
 		read = new Read(file);
 		data = new Data(divisor, accuracy, powerOfMaxGroup, powerOfVariance);
@@ -171,6 +185,106 @@ public class MainFromRadar extends Thread{
 		});
 		sliderOfAccuracy.setBounds(view.DEFAULT_SIZE, 190, view.WIDTH_BUTTON, 40);
 		view.add(sliderOfAccuracy);*/
+		sliderOfMinimumX = new JSlider(0, View.DEFAULT_SIZE, minimumX);
+		sliderOfMinimumX.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JSlider slider = (JSlider) e.getSource();
+				minimumX = slider.getValue();
+				view.minimumX=minimumX;
+				 try {
+					saveSettings();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (data.isFlaged()) {
+					data.unCluster();
+					data.cluster();
+				}
+				frame.repaint();
+			}
+		});
+		sliderOfMinimumX.setBounds(view.DEFAULT_SIZE, 360, view.WIDTH_BUTTON, 40);
+		view.add(sliderOfMinimumX);
+		
+		sliderOfMinimumY = new JSlider(0, View.DEFAULT_SIZE, minimumY);
+		sliderOfMinimumY.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JSlider slider = (JSlider) e.getSource();
+				minimumY = slider.getValue();
+				view.minimumY=minimumY;
+				 try {
+					saveSettings();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (data.isFlaged()) {
+					data.unCluster();
+					data.cluster();
+				}
+				frame.repaint();
+			}
+		});
+		sliderOfMinimumY.setBounds(view.DEFAULT_SIZE, 390, view.WIDTH_BUTTON, 40);
+		view.add(sliderOfMinimumY);
+
+		sliderOfMaximumX = new JSlider(0, View.DEFAULT_SIZE, maximumX);
+		sliderOfMaximumX.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JSlider slider = (JSlider) e.getSource();
+				maximumX = slider.getValue();
+				view.maximumX=maximumX;
+				 try {
+					saveSettings();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (data.isFlaged()) {
+					data.unCluster();
+					data.cluster();
+				}
+				frame.repaint();
+			}
+		});
+		sliderOfMaximumX.setBounds(view.DEFAULT_SIZE, 420, view.WIDTH_BUTTON, 40);
+		view.add(sliderOfMaximumX);
+		
+		sliderOfMaximumY = new JSlider(0, View.DEFAULT_SIZE, maximumY);
+		sliderOfMaximumY.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				JSlider slider = (JSlider) e.getSource();
+				maximumY = slider.getValue();
+				view.maximumY=maximumY;
+				 try {
+					saveSettings();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				if (data.isFlaged()) {
+					data.unCluster();
+					data.cluster();
+				}
+				frame.repaint();
+			}
+		});
+		sliderOfMaximumY.setBounds(view.DEFAULT_SIZE, 450, view.WIDTH_BUTTON, 40);
+		view.add(sliderOfMaximumY);
+
 		sliderOfShift = new JSlider(-100, 1000, shift);
 		sliderOfShift.addChangeListener(new ChangeListener() {
 
@@ -180,7 +294,7 @@ public class MainFromRadar extends Thread{
 				JSlider slider = (JSlider) e.getSource();
 				shift = slider.getValue();
 				view.shift=shift;
-				 try {
+				try {
 					saveSettings();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
@@ -195,7 +309,6 @@ public class MainFromRadar extends Thread{
 		});
 		sliderOfShift.setBounds(view.DEFAULT_SIZE, 480, view.WIDTH_BUTTON, 40);
 		view.add(sliderOfShift);
-		
 
 		sliderOfDivisor = new JSlider(1, 500, divisor);
 		sliderOfDivisor.addChangeListener(new ChangeListener() {
@@ -388,6 +501,10 @@ public class MainFromRadar extends Thread{
 			powerOfVariance=Integer.parseInt(settings.getProperty("powerOfVariance","100"));
 			angle=Integer.parseInt(settings.getProperty("angle","360"));
 			scale=Integer.parseInt(settings.getProperty("scale","120"));
+			minimumX=Integer.parseInt(settings.getProperty("minimumX","0"));
+			minimumY=Integer.parseInt(settings.getProperty("minimumY","0"));
+			maximumX=Integer.parseInt(settings.getProperty("maximumX",""+View.DEFAULT_SIZE));
+			maximumY=Integer.parseInt(settings.getProperty("maximumY","" + View.DEFAULT_SIZE));
 			file=settings.getProperty("file","1.txt");
 		}
 	}
@@ -401,6 +518,10 @@ public class MainFromRadar extends Thread{
 		settings.put("powerOfVariance",String.valueOf(powerOfVariance));
 		settings.put("angle",String.valueOf(angle));
 		settings.put("scale",String.valueOf(scale));
+		settings.put("minimumX",String.valueOf(minimumX));
+		settings.put("minimumY",String.valueOf(minimumY));
+		settings.put("maximumX",String.valueOf(maximumX));
+		settings.put("maximumY",String.valueOf(maximumY));
 		settings.put("file",file);
 		FileOutputStream out = new FileOutputStream(tmpName);
 		settings.store(out,"program properties");

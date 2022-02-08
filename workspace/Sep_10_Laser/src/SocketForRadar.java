@@ -27,6 +27,7 @@ public class SocketForRadar {
 		int[] depths = null;
 		Scanner in = new Scanner(System.in);
 		RadarReader a = new RadarReader();
+		a.connect();
 		a.setName("reader");
 		a.start();
 		int[] same = new int[1081];
