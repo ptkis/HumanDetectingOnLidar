@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -19,6 +21,8 @@ public class View extends JPanel {
 	public int minimumY = 0;
 	public int maximumX = DEFAULT_SIZE;
 	public int maximumY = DEFAULT_SIZE;
+	public boolean mouse = false;
+	private final List<MouseRobot> robots = new ArrayList<>();
 
 	public View() {
 		super();
@@ -98,6 +102,12 @@ public class View extends JPanel {
 
 			if (x >= minimumX && x <= maximumX && y >= minimumY && y <= maximumY) {
 				g2.fillOval((int) (x), (int) (y) + shift, 3, 3);
+
+				if (mouse) {
+					for (MouseRobot robot : robots) {
+						robot.click((int) x, (int)y);
+					}
+				}
 			}
 
 		}
@@ -171,5 +181,13 @@ public class View extends JPanel {
 
 	public Dimension getPreferredSize() {
 		return new Dimension(DEFAULT_SIZE + WIDTH_BUTTON, DEFAULT_SIZE);
+	}
+
+	public void addMouseRobot(MouseRobot robot) {
+		robots.add(robot);
+	}
+
+	public void removeMouseRobot(MouseRobot robot) {
+		robots.remove(robot);
 	}
 }

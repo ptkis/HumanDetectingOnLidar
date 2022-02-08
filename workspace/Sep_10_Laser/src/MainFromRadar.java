@@ -1,7 +1,7 @@
-import java.awt.FileDialog;
-import java.awt.Frame;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.Scanner;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JSlider;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -41,6 +39,7 @@ public class MainFromRadar extends Thread{
 	JSlider sliderOfMinimumY;
 	JSlider sliderOfMaximumX;
 	JSlider sliderOfMaximumY;
+	JCheckBox checkboxMouse;
 
 
 	// minThreshold=maxDepth/divisor
@@ -55,11 +54,12 @@ public class MainFromRadar extends Thread{
 	int minimumY = 0;
 	int maximumX = View.DEFAULT_SIZE;
 	int maximumY = View.DEFAULT_SIZE;
+	boolean mouse = false;
 	boolean start = false;
 	String file="1.txt";
 
 	
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, AWTException {
 		MainFromRadar main= new MainFromRadar();
 		main.init();
 		
@@ -74,7 +74,7 @@ public class MainFromRadar extends Thread{
 		}
 	}
 
-	public void init() throws IOException {
+	public void init() throws IOException, AWTException {
 
 		radarReader = new RadarReader();
 		if (ENABLE_RADAR) {
@@ -91,6 +91,19 @@ public class MainFromRadar extends Thread{
 		// data.generate(400, 5, 20);
 		frame = new JFrame();
 		view = new View(data,angle,scale,shift);
+		view.mouse = mouse;
+		view.minimumX = minimumX;
+		view.minimumY = minimumY;
+		view.maximumX = maximumX;
+		view.maximumY = maximumY;
+
+		Robot robot = new Robot();
+		view.addMouseRobot((x, y) -> {
+			robot.mouseMove(x, y);
+			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+		});
+
 		frame.add(view);
 		JButton btn = new JButton("CLUSTER");
 		btn.addActionListener(new ActionListener() {
@@ -185,6 +198,25 @@ public class MainFromRadar extends Thread{
 		});
 		sliderOfAccuracy.setBounds(view.DEFAULT_SIZE, 190, view.WIDTH_BUTTON, 40);
 		view.add(sliderOfAccuracy);*/
+		checkboxMouse = new JCheckBox("Mouse", mouse);
+		checkboxMouse.addActionListener(e -> {
+			JCheckBox source = (JCheckBox) e.getSource();
+			mouse = source.isSelected();
+			view.mouse = mouse;
+			try {
+				saveSettings();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			if (data.isFlaged()) {
+				data.unCluster();
+				data.cluster();
+			}
+			frame.repaint();
+		});
+		checkboxMouse.setBounds(view.DEFAULT_SIZE, 310, view.WIDTH_BUTTON, 40);
+		view.add(checkboxMouse);
+
 		sliderOfMinimumX = new JSlider(0, View.DEFAULT_SIZE, minimumX);
 		sliderOfMinimumX.addChangeListener(new ChangeListener() {
 
@@ -209,7 +241,7 @@ public class MainFromRadar extends Thread{
 		});
 		sliderOfMinimumX.setBounds(view.DEFAULT_SIZE, 360, view.WIDTH_BUTTON, 40);
 		view.add(sliderOfMinimumX);
-		
+
 		sliderOfMinimumY = new JSlider(0, View.DEFAULT_SIZE, minimumY);
 		sliderOfMinimumY.addChangeListener(new ChangeListener() {
 
@@ -505,6 +537,7 @@ public class MainFromRadar extends Thread{
 			minimumY=Integer.parseInt(settings.getProperty("minimumY","0"));
 			maximumX=Integer.parseInt(settings.getProperty("maximumX",""+View.DEFAULT_SIZE));
 			maximumY=Integer.parseInt(settings.getProperty("maximumY","" + View.DEFAULT_SIZE));
+			mouse=Boolean.parseBoolean(settings.getProperty("mouse","false"));
 			file=settings.getProperty("file","1.txt");
 		}
 	}
@@ -522,6 +555,7 @@ public class MainFromRadar extends Thread{
 		settings.put("minimumY",String.valueOf(minimumY));
 		settings.put("maximumX",String.valueOf(maximumX));
 		settings.put("maximumY",String.valueOf(maximumY));
+		settings.put("mouse", ""+mouse);
 		settings.put("file",file);
 		FileOutputStream out = new FileOutputStream(tmpName);
 		settings.store(out,"program properties");
