@@ -41,8 +41,10 @@ public class RadarReader extends Thread{
 	}
 	public CaptureData getDataFromRadar(){
 		while(capData==null||capData.steps==null||capData.steps.get(0).distances==null){
-			capData= device.capture();
-            //System.out.print(data.steps.get(0).distances.get(0)+";");
+			if (device.isConnected()) {
+				capData= device.capture();
+			}
+			//System.out.print(data.steps.get(0).distances.get(0)+";");
            // System.out.println(); 	
         	try {
 				Thread.sleep(20);

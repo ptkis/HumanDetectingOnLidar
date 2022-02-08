@@ -99,7 +99,11 @@ public class MainFromRadar extends Thread{
 
 		Robot robot = new Robot();
 		view.addMouseRobot((x, y) -> {
-			robot.mouseMove(x, y);
+			Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+			int x1 = (int) (x * screenSize.width);
+			int y1 = (int) (y * screenSize.getHeight());
+			System.out.println("mouse screen="+x1+","+y1);
+			robot.mouseMove(x1, y1);
 			robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
 			robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
 		});
@@ -517,6 +521,7 @@ public class MainFromRadar extends Thread{
 		if (data.isFlaged()) {
 			data.cluster();
 		}
+		view.updateMouse();
 		frame.repaint();
 	}
 	

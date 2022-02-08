@@ -1,8 +1,4 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +36,7 @@ public class View extends JPanel {
 		if (data.getDepths() == null || data.getDepths().get(0) == null)
 			return;
 		super.paint(g);
-		double angle = (totalAngle / 360.0 * 2 * Math.PI) / (data.getDepths().size());
+		double angle = calcAngle();
 		double x, y, x1, y1;
 		Graphics2D g2 = (Graphics2D) g;
 		double range = maxRange * scale / 100;
@@ -85,31 +81,10 @@ public class View extends JPanel {
 		g2.drawRect(minimumX, minimumY + shift, maximumX - minimumX, maximumY - minimumY);
 
 		g2.setColor(Color.BLUE);
-		for (int i = 0; i < data.getDepths().size(); i++) {
-			x = y = 0;
-			// System.out.println("x="+(int)(x-DEFAULT_SIZE/2)+"
-			// y="+(int)(y-DEFAULT_SIZE/2));
-			try {
-				x = (data.getDepths().get(i).depth) * Math.cos(-angle * i - Math.PI / 4 * 3 + Math.PI) / range
-						* (DEFAULT_SIZE / 2) + DEFAULT_SIZE / 2;
-				y = (data.getDepths().get(i).depth) * Math.sin(-angle * i - Math.PI / 4 * 3 + Math.PI) / range
-						* (DEFAULT_SIZE / 2) + DEFAULT_SIZE / 2;
+		List<Point> points = calcPoints();
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-			}
-			// check bounds
-
-			if (x >= minimumX && x <= maximumX && y >= minimumY && y <= maximumY) {
-				g2.fillOval((int) (x), (int) (y) + shift, 3, 3);
-
-				if (mouse) {
-					for (MouseRobot robot : robots) {
-						robot.click((int) x, (int)y);
-					}
-				}
-			}
-
+		for (Point point : points) {
+			g2.fillOval((int) point.getX(), (int) point.getY() + shift, 3, 3);
 		}
 		// 晤瘍ㄐㄐ
 		if (isNumbered) {
@@ -179,6 +154,38 @@ public class View extends JPanel {
 		}
 	}
 
+	private List<Point> calcPoints() {
+		List<Point> points;
+		points = new ArrayList<>();
+		double range = maxRange * scale / 100;
+		double angle = calcAngle();
+		for (int i = 0; i < data.getDepths().size(); i++) {
+			double x, y;
+			x = y = 0;
+			// System.out.println("x="+(int)(x-DEFAULT_SIZE/2)+"
+			// y="+(int)(y-DEFAULT_SIZE/2));
+			try {
+				x = (data.getDepths().get(i).depth) * Math.cos(-angle * i - Math.PI / 4 * 3 + Math.PI) / range
+						* (DEFAULT_SIZE / 2) + DEFAULT_SIZE / 2;
+				y = (data.getDepths().get(i).depth) * Math.sin(-angle * i - Math.PI / 4 * 3 + Math.PI) / range
+						* (DEFAULT_SIZE / 2) + DEFAULT_SIZE / 2;
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+			}
+			// check bounds
+
+			if (x >= minimumX && x <= maximumX && y >= minimumY && y <= maximumY) {
+				points.add(new Point((int) x,(int) y));
+			}
+		}
+		return points;
+	}
+
+	private double calcAngle() {
+		return (totalAngle / 360.0 * 2 * Math.PI) / (data.getDepths().size());
+	}
+
 	public Dimension getPreferredSize() {
 		return new Dimension(DEFAULT_SIZE + WIDTH_BUTTON, DEFAULT_SIZE);
 	}
@@ -189,5 +196,19 @@ public class View extends JPanel {
 
 	public void removeMouseRobot(MouseRobot robot) {
 		robots.remove(robot);
+	}
+	
+	public void updateMouse() {
+		List<Point> points = calcPoints();
+		for (Point point : points) {
+			if (mouse) {
+				for (MouseRobot robot : robots) {
+					double xFraction = (point.getX() - minimumX) / (maximumX - minimumX);
+					double yFraction = (point.getY() - minimumY) / (maximumY - minimumY);
+					System.out.println("mouse fraction="+xFraction+","+yFraction);
+					robot.click(xFraction, yFraction);
+				}
+			}
+		}
 	}
 }
